@@ -17,6 +17,8 @@ runs:
   steps:
     - uses: actions/checkout@v4
     - run: |
+        echo $PWD
+        ls -lah $PWD
         ls -lah ${{inputs.scan-path}} && \
         docker run -t -v "$PWD/${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:latest filesystem /workdir \
         --fail --only-verified --json --debug | jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' \
