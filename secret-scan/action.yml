@@ -26,8 +26,7 @@ runs:
     - run: |
         docker run -t -v "${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:latest filesystem /workdir \
         --only-verified --json | jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' \
-        | tee /tmp/th.out
-        cat /tmp/th.out
+        > tee /tmp/th.out
       shell: bash
     - id: secrets-found
       run: |
