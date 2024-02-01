@@ -18,7 +18,9 @@ runs:
     - run: |
         ls -lah ${{github.workspace}} && \
         docker run -t -v "${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:latest filesystem /workdir \
-        --fail --only-verified --json --debug | jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' \
+        --fail --only-verified --json --debug | tee docker.out
+        cat docker.out
+        jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' docker.out \
         | tee /tmp/th.out
         cat /tmp/th.out
       shell: bash
