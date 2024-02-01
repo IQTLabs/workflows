@@ -15,7 +15,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
     - run: |
         ls -lah ${{github.workspace}} && \
         docker run -t -v "${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:latest filesystem /workdir \
