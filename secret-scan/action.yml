@@ -1,0 +1,31 @@
+name: 'Secret Scan'
+description: 'Run Secret Scanning tools acrosss a repository to ensure that the repo is not compromised'
+inputs:
+  scan-path:  
+    description: 'path to scan for secrets'
+    required: true
+    default: '${{ GITHUB_WORKSPACE }}'
+outputs:
+  verified-secrets:
+    description: "Number of verified secrets found"
+    value: ${{ steps.secrets-found.outputs.verified-secrets }}
+  unverified-secrets:
+    description: "Number of verified secrets found"
+    value: ${{ steps.secrets-found.outputs.unverified-secrets }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - run: |
+        ls -lah ${{inputs.scan-path}} && \
+        docker run -t -v "$PWD/${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:latest filesystem /workdir \
+        --fail --only-verified --json --debug | jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' \
+        | tee /tmp/th.out
+        cat /tmp/th.out
+      shell: bash
+    - id: secrets-found
+      run: |
+        echo "verified-secrets=$(jq '."verified"' /tmp/th.out)" >> $GITHUB_OUTPUT && \
+        echo "unverified-secrets=$(jq '."unverified"' /tmp/th.out)" >> $GITHUB_OUTPUT
+      shell: bash
+ 
