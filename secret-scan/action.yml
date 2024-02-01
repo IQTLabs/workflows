@@ -35,14 +35,14 @@ runs:
       shell: bash
     - name: Log Outputs
       if: inputs.log-outputs
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
             core.info(`Number of verified secrets: ${{steps.secrets-found.outputs.verified-secrets}}`)
             core.info(`Number of unverified secrets: ${{steps.secrets-found.outputs.unverified-secrets}}`)
     - name: Fail if found
       if: inputs.fail-on-found && steps.scan.outputs.verified-secrets > 0 
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
             core.setFailed('Secrets found.')
