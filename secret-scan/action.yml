@@ -17,7 +17,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
     - run: |
-        ls -lah ${{github.workspace}}/../ && \
+        ls -lah ${{github.workspace}} && \
         docker run -t -v "${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:latest filesystem /workdir \
         --fail --only-verified --json --debug | jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' \
         | tee /tmp/th.out
