@@ -5,6 +5,14 @@ inputs:
     description: 'path to scan for secrets'
     required: true
     default: '${{ github.workspace }}'
+  log-outputs:
+    description: 'Output counts of secrets found'
+    required: true
+    default: true
+  fail-on-found:
+    description: 'fail the build if secrets are found'
+    required: true
+    default: true
 outputs:
   verified-secrets:
     description: "Number of verified secrets found"
@@ -16,11 +24,8 @@ runs:
   using: composite
   steps:
     - run: |
-        ls -lah ${{github.workspace}} && \
         docker run -t -v "${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:latest filesystem /workdir \
-        --only-verified --json | tee docker.out
-        cat docker.out
-        jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' docker.out \
+        --only-verified --json | jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' \
         | tee /tmp/th.out
         cat /tmp/th.out
       shell: bash
@@ -29,4 +34,17 @@ runs:
         echo "verified-secrets=$(jq '."verified"' /tmp/th.out)" >> $GITHUB_OUTPUT && \
         echo "unverified-secrets=$(jq '."unverified"' /tmp/th.out)" >> $GITHUB_OUTPUT
       shell: bash
+    - name: Log Outputs
+      if: inputs.log-outputs
+      uses: actions/github-script@v6
+      with:
+        script: |
+            core.info(`Number of verified secrets: ${{steps.scan.outputs.verified-secrets}}`)
+            core.info(`Number of unverified secrets: ${{steps.scan.outputs.unverified-secrets}}`)
+    - name: Fail if found
+      if: inputs.fail-on-found && steps.scan.outputs.verified-secrets > 0 
+      uses: actions/github-script@v6
+      with:
+        script: |
+            core.setFailed('Secrets found.')
  
