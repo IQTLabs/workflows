@@ -4,7 +4,7 @@ inputs:
   scan-path:  
     description: 'path to scan for secrets'
     required: true
-    default: '${{ env.GITHUB_WORKSPACE }}'
+    default: '${{ github.workspace }}'
 outputs:
   verified-secrets:
     description: "Number of verified secrets found"
