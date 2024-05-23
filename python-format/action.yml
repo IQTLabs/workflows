@@ -1,0 +1,22 @@
+name: python-formatting-consistency
+run-name: ${{ github.run_id }}, authored by @${{ github.actor }}
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+
+jobs:
+  run-formatter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12.1
+      - run: python3 -m pip install --upgrade pip
+      - run: python3 -m pip install black==24.1.1
+      - id: python-files-found
+        run: echo "python-file-list="$(git ls-files "*.py" | xargs -I {} sh -c 'full_path=$(git rev-parse --show-toplevel)/{}; echo "$full_path"')"" >> $GITHUB_OUTPUT
+
+      - if: steps.python-files-found.outputs.python-file-list
+        run: for file in ${{steps.python-files-found.outputs.python-file-list}}; do black --check "$file" ; done;
