@@ -28,7 +28,7 @@ runs:
   using: composite
   steps:
     - run: |
-        docker run -v "${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:${{inputs.trufflehog-version}} filesystem /workdir \
+        docker run -t -v "${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:${{inputs.trufflehog-version}} filesystem /workdir \
         --only-verified --json | grep "finished scanning" | jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' \
         > /tmp/th.out
       shell: bash
