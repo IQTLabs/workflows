@@ -16,7 +16,7 @@ inputs:
   trufflehog-version:
     description: 'Trufflehog docker tag version to use'
     required: true
-    default: '3.81.8'
+    default: '3.81.6'
 outputs:
   verified-secrets:
     description: "Number of verified secrets found"
