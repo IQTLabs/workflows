@@ -16,7 +16,7 @@ inputs:
   trufflehog-version:
     description: 'Trufflehog docker tag version to use'
     required: true
-    default: '3.81.6'
+    default: '3.81.8'
 outputs:
   verified-secrets:
     description: "Number of verified secrets found"
@@ -28,8 +28,8 @@ runs:
   using: composite
   steps:
     - run: |
-        docker run -t -v "${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:${{inputs.trufflehog-version}} filesystem /workdir \
-        --only-verified --json | jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' \
+        docker run -v "${{inputs.scan-path}}:/workdir" trufflesecurity/trufflehog:${{inputs.trufflehog-version}} filesystem /workdir \
+        --only-verified --json | grep "finished scanning" | jq -cs '.[-1]|{"verified":.verified_secrets, "unverified":.unverified_secrets}' \
         > /tmp/th.out
       shell: bash
     - id: secrets-found
