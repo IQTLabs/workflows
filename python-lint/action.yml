@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.13.2
+          python-version: 3.13.3
       - run: python3 -m pip install --upgrade pip
       - run: python3 -m pip install ruff==0.1.15
       - run: ruff --respect-gitignore $GITHUB_WORKSPACE # ruff automatically finds python files
